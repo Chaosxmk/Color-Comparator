@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html class="min-vh-100" lang="en-gb" dir="ltr">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+  <meta charset="utf-8"/>
+  <title>Color comparator</title>
+  <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+  <link href="favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
+  <style>
+    nav {
+      z-index: 100;
+    }
+
+    main {
+      z-index: 50;
+    }
+
+    aside {
+      z-index: 10;
+    }
+  </style>
+  <script>
+    const Hex2RGB = (hex) => {
+      // Remove the hash sign if it's included
+      hex = hex.replace(/^#/, '');
+
+      // Expand shorthand form (e.g., "03F") to full form (e.g., "0033FF")
+      const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+      hex = hex.replace(shorthandRegex, (m, r, g, b) => r + r + g + g + b + b);
+
+      // Parse the hex values
+      const bigint = parseInt(hex, 16);
+
+      // Extract RGB components
+      const r = (bigint >> 16) & 255;
+      const g = (bigint >> 8) & 255;
+      const b = bigint & 255;
+
+      console.log(r, g, b)
+
+      // Return the RGB values as an object
+      return {r, g, b};
+    };
+
+    const RGB2Hex = (rgb) => {
+      // Remove any non-numeric characters from the string
+      rgb = rgb.replace(/[^\d,]/g, '');
+
+      // Split the cleaned string into separate numbers
+      const [r, g, b] = rgb.split(',').map(Number);
+
+      // Convert each component to a 2-digit hex value
+      const rHex = r.toString(16).padStart(2, '0');
+      const gHex = g.toString(16).padStart(2, '0');
+      const bHex = b.toString(16).padStart(2, '0');
+
+      // Combine the hex values
+      return `${rHex}${gHex}${bHex}`;
+    };
+
+    $(window).on('load', () => {
+      $('.hex-colors').on('keyup change blur', (event) => {
+        const input = $(event.currentTarget);
+        const target = $(input.data('target'));
+        const paint = $(input.data('paint'));
+
+        let hexValue = input.val().replace(/^#/, '');
+
+        if (hexValue === '') {
+          paint.css('background-color', "transparent");
+          target.val(null);
+          return;
+        } else if (hexValue.length !== 3 && hexValue.length !== 6) {
+          paint.css('background-color', "transparent");
+          target.val(null);
+          return;
+        }
+
+        let rgbValue = Object.values(Hex2RGB(hexValue)).join(", ");
+
+        input.val(hexValue.toUpperCase());
+        target.val(rgbValue);
+        paint.css('background-color', `#${hexValue}`);
+      })
+
+      $('.rgb-colors').on('keyup change blur', (event) => {
+        const input = $(event.currentTarget);
+        const target = $(input.data('target'));
+        const paint = $(input.data('paint'));
+
+        let rgbValue = input.val().replace(/[^\d,]/g, '');
+
+        if (rgbValue === '') {
+          paint.css('background-color', "transparent");
+          target.val(null);
+          return;
+        } else if ((rgbValue.match(/,/g) || []).length !== 2) {
+          return;
+        }
+
+        let hexValue = RGB2Hex(rgbValue);
+        rgbValue = Object.values(Hex2RGB(hexValue)).join(", ");
+
+        input.val(rgbValue);
+        target.val(hexValue);
+        paint.css('background-color', `#${hexValue}`);
+      })
+    });
+  </script>
+</head>
+<body class="vh-100 d-flex p-3 flex-column">
+  <nav class="position-fixed top-0 start-0 m-3">
+    <a href="./advanced.html" class="btn btn-primary btn-sm">Advanced mode</a>
+  </nav>
+
+  <main class="my-auto position-relative">
+    <form class="container container-fluid p-3 border rounded bg-light">
+      <div class="row align-items-center g-3">
+        <div class="col-lg col-sm-6 col-12">
+          <div class="form-floating">
+            <input type="text" class="form-control hex-colors" id="hexA" data-target="#rgbA" data-paint=".color-a" maxlength="7" placeholder="Hex">
+            <label for="hexA">Hex</label>
+          </div>
+        </div>
+
+        <div class="col-lg col-sm-6 col-12">
+          <div class="form-floating">
+            <input type="text" class="form-control rgb-colors" id="rgbA" data-target="#hexA" data-paint=".color-a" maxlength="13" placeholder="RGB">
+            <label for="rgbA">RGB</label>
+          </div>
+        </div>
+
+        <div class="col-lg-auto col-12">
+          <span class="vr d-lg-block d-none m-0"></span>
+          <hr class="d-lg-none m-0">
+        </div>
+
+        <div class="col-lg col-sm-6 col-12">
+          <div class="form-floating">
+            <input type="text" class="form-control hex-colors" id="hexB" data-target="#rgbB" data-paint=".color-b" maxlength="7" placeholder="Hex">
+            <label for="hexB">Hex</label>
+          </div>
+        </div>
+
+        <div class="col-lg col-sm-6 col-12">
+          <div class="form-floating">
+            <input type="text" class="form-control rgb-colors" id="rgbB" data-target="#hexB" data-paint=".color-b" maxlength="13" placeholder="RGB">
+            <label for="rgbB">RGB</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <aside class="w-100 h-100 position-fixed top-0 start-0">
+    <div class="color-a w-100 h-100 position-absolute top-0 start-0 d-lg-block d-none"></div>
+    <div class="color-b w-50 h-100 position-absolute top-0 end-0 d-lg-block d-none"></div>
+
+    <div class="color-a w-100 h-100 position-absolute top-0 start-0 d-lg-none"></div>
+    <div class="color-b w-100 h-50 position-absolute bottom-0 start-0 d-lg-none"></div>
+  </aside>
+</body>
+</html>

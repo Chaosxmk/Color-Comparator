@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html class="min-vh-100" lang="en-gb" dir="ltr">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1"/>
+  <meta charset="utf-8"/>
+  <title>Color comparator</title>
+  <link href="favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
+  <link href="favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
+  <style>
+    nav, .form-check-container {
+      z-index: 100;
+    }
+
+    .form-check-container:has(input:checked) ~ main {
+      display: none !important;
+    }
+
+    main {
+      z-index: 50;
+    }
+
+    aside {
+      z-index: 10;
+    }
+
+    aside .color-b > div {
+      display: flex;
+      min-height: 50px;
+      background-color: var(--color);
+      align-items: center;
+      justify-content: center;
+      flex-grow: 1;
+    }
+  </style>
+  <script>
+    $(window).on('load', () => {
+      $('.hex-colors').on('keyup change blur', (event) => {
+        const input = $(event.currentTarget);
+        const paint = $(input.data('paint'));
+
+        if (input.is('input')) {
+          let hexValue = input.val().replace(/^#/, '');
+
+          if (hexValue === '') {
+            paint.css('background-color', "transparent");
+            return;
+          } else if (hexValue.length !== 3 && hexValue.length !== 6) {
+            paint.css('background-color', "transparent");
+            return;
+          }
+
+          input.val(hexValue.toUpperCase());
+          paint.css('background-color', `#${hexValue}`);
+        } else if (input.is('textarea')) {
+          const lines = input.val().split(/\r?\n|\r|\n/g);
+          paint.empty();
+
+          for (let raw of lines) {
+            let line = raw.trim();
+            if (!line) continue;
+
+            if (/rgb\s*\(/i.test(line)) {
+              console.log('rgb detected');
+              continue;
+            }
+
+            line = line.match(/#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})/);
+            if (!line) continue;
+
+            line = line[1].toUpperCase();
+            paint.append(`<div style="--color:#${line}"><p class="d-inline-block bg-light bg-opacity-50 m-0 px-2 py-1 rounded">${raw}</p></div>`);
+          }
+        }
+      });
+
+      $('.hex-colors').trigger('blur');
+    });
+  </script>
+</head>
+<body>
+  <nav class="position-fixed top-0 start-0 m-3">
+    <a href="./basic.html" class="btn btn-primary btn-sm">Basic mode</a>
+  </nav>
+
+  <div class="form-check-container position-fixed bottom-0 start-0 bg-light m-3 px-2 py-1 rounded">
+    <div class="form-check m-0 user-select-none">
+      <input type="checkbox" class="form-check-input" id="hideInput">
+      <label class="form-check-label" for="hideInput">Hide inputs</label>
+    </div>
+  </div>
+
+  <main class="my-3 position-sticky top-0">
+    <form class="container container-fluid p-3 border rounded bg-light">
+      <div class="row align-items-center g-3">
+        <div class="col-lg col-sm-6 col-12">
+          <div class="form-floating">
+            <input type="text" class="form-control hex-colors" id="hexA" data-paint=".color-a" maxlength="7" placeholder="Hex">
+            <label for="hexA">Hex</label>
+          </div>
+        </div>
+
+        <div class="col-lg-auto col-12">
+          <span class="vr d-lg-block d-none m-0"></span>
+          <hr class="d-lg-none m-0">
+        </div>
+
+        <div class="col-lg col-sm-6 col-12">
+          <div class="form-floating">
+            <textarea class="form-control hex-colors" id="hexB" data-paint=".color-b" placeholder="Hex"></textarea>
+            <label for="hexB">Hex</label>
+          </div>
+        </div>
+      </div>
+    </form>
+  </main>
+
+  <aside class="w-100 h-100 position-fixed top-0 start-0">
+    <div class="color-a w-100 h-100 position-absolute top-0 start-0"></div>
+    <div class="color-b w-50 h-100 position-absolute top-0 end-0 overflow-auto d-flex flex-column"></div>
+  </aside>
+</body>
+</html>
