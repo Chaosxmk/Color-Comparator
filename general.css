@@ -1,0 +1,24 @@
+nav, .form-check-container {
+  z-index: 100;
+}
+
+.form-check-container:has(input:checked) ~ main {
+  display: none !important;
+}
+
+main {
+  z-index: 50;
+}
+
+aside {
+  z-index: 10;
+}
+
+aside .color-b > div {
+  display: flex;
+  min-height: 50px;
+  background-color: var(--color);
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
