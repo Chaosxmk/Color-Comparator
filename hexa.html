@@ -12,40 +12,28 @@
   <link rel="stylesheet" href="style/general.css"/>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@latest/dist/css/bootstrap.css"/>
   <script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script>
-  <script src="script/advanced.js"></script>
+  <script src="script/hexa.js" type="module"></script>
 </head>
-<body>
+<body class="vh-100 d-flex p-3 flex-column">
   <nav class="position-fixed top-0 start-0 m-3">
     <a href="./basic.html" class="btn btn-primary btn-sm">Basic mode</a>
-    <a href="./hexa.html" class="btn btn-primary btn-sm">Hexa mode</a>
+    <a href="./advanced.html" class="btn btn-primary btn-sm">Advanced mode</a>
   </nav>
 
-  <div class="form-check-container position-fixed bottom-0 start-0 bg-light m-3 px-2 py-1 rounded">
-    <div class="form-check m-0 user-select-none">
-      <input type="checkbox" class="form-check-input" id="hideInput">
-      <label class="form-check-label" for="hideInput">Hide inputs</label>
-    </div>
-  </div>
-
-  <main class="my-3 position-sticky top-0">
+  <main class="my-auto position-relative">
     <form class="container container-fluid p-3 border rounded bg-light">
       <div class="row align-items-center g-3">
-        <div class="col-sm col-12">
+        <div class="col-lg col-sm-6 col-12">
           <div class="form-floating">
-            <input type="text" class="form-control hex-colors" id="hexA" data-paint=".color-a" maxlength="7" placeholder="Hex">
-            <label for="hexA">Hex</label>
+            <input type="text" class="form-control hex-colors" id="hexa" data-target="#rgba" data-paint=".color" maxlength="9" placeholder="HexA">
+            <label for="hexa">Hexa</label>
           </div>
         </div>
 
-        <div class="col-lg-auto col-12">
-          <span class="vr d-lg-block d-none m-0"></span>
-          <hr class="d-lg-none m-0">
-        </div>
-
-        <div class="col-sm col-12">
+        <div class="col-lg col-sm-6 col-12">
           <div class="form-floating">
-            <textarea class="form-control hex-colors" id="hexB" data-paint=".color-b" placeholder="Hex"></textarea>
-            <label for="hexB">Hex</label>
+            <input type="text" class="form-control rgb-colors" id="rgba" data-target="#hexa" data-paint=".color" placeholder="RGBA">
+            <label for="rgba">RGBA</label>
           </div>
         </div>
       </div>
@@ -53,8 +41,7 @@
   </main>
 
   <aside class="w-100 h-100 position-fixed top-0 start-0">
-    <div class="color-a w-100 h-100 position-absolute top-0 start-0"></div>
-    <div class="color-b w-50 h-100 position-absolute top-0 end-0 overflow-auto d-flex flex-column"></div>
+    <div class="color w-100 h-100"></div>
   </aside>
 </body>
 </html>

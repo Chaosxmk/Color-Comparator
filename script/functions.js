@@ -18,6 +18,36 @@ const Hex2RGB = (hex) => {
   return {r, g, b};
 };
 
+const HexA2RGBA = (hex) => {
+  // Remove the hash sign if it's included
+  hex = hex.replace(/^#/, '').trim();
+
+  // Expand shorthand (#RGB → #RRGGBB, #RGBA → #RRGGBBAA)
+  if (hex.length === 3) {
+    hex = hex.replace(/([a-f\d])([a-f\d])([a-f\d])/i,
+      (m, r, g, b) => r + r + g + g + b + b
+    );
+  } else if (hex.length === 4) {
+    hex = hex.replace(/([a-f\d])([a-f\d])([a-f\d])([a-f\d])/i,
+      (m, r, g, b, a) => r + r + g + g + b + b + a + a
+    );
+  }
+
+  // Validate supported lengths
+  if (![6, 8].includes(hex.length)) {
+    throw new Error("Invalid hex color: " + hex);
+  }
+
+  const bigint = parseInt(hex, 16);
+
+  const r = (bigint >> (hex.length === 8 ? 24 : 16)) & 255;
+  const g = (bigint >> (hex.length === 8 ? 16 : 8)) & 255;
+  const b = (bigint >> (hex.length === 8 ? 8 : 0)) & 255;
+  const a = hex.length === 8 ? ((bigint & 255) / 255) : 1;
+
+  return {r, g, b, a};
+};
+
 const RGB2Hex = (rgb) => {
   // Remove any non-numeric characters from the string
   rgb = rgb.replace(/[^\d,]/g, '');
@@ -34,7 +64,35 @@ const RGB2Hex = (rgb) => {
   return `${rHex}${gHex}${bHex}`;
 };
 
+const RGBA2HexA = (rgb) => {
+  // Remove any non-numeric characters from the string
+  const m = rgb.match(/(\d+)\s*,\s*(\d+)\s*,\s*(\d+)(?:\s*,\s*([\d.]+))?/);
+
+  if (!m) {
+    throw new Error("Invalid RGB/RGBA format: " + rgb);
+  }
+
+  const r = Number(m[1]);
+  const g = Number(m[2]);
+  const b = Number(m[3]);
+  let a = m[4] !== undefined ? parseFloat(m[4]) : 1;
+
+  // Clamp alpha 0–1
+  a = Math.max(0, Math.min(1, a));
+
+  const toHex = (v) => {
+    const n = Math.max(0, Math.min(255, Number(v)));
+    return n.toString(16).padStart(2, '0');
+  };
+
+  const alphaByte = Math.round(a * 255);
+
+  return `${toHex(r)}${toHex(g)}${toHex(b)}${toHex(alphaByte)}`.toUpperCase();
+};
+
 export {
   Hex2RGB,
-  RGB2Hex
+  HexA2RGBA,
+  RGB2Hex,
+  RGBA2HexA
 }
